@@ -7,10 +7,10 @@
 
 const std::string reset = "\x1b[0m";
 
-const std::unordered_map<int, std::string> v�riMap{
+const std::unordered_map<int, std::string> väriMap{
     {0, "\x1b[30m"}, // Musta
     {1, "\x1b[31m"}, // Punane
-    {2, "\x1b[32m"}, // Vihri�
+    {2, "\x1b[32m"}, // Vihriä
     {3, "\x1b[33m"}, // Keltainen
     {4, "\x1b[34m"}, // Sininen
     {5, "\x1b[35m"}, // Magenta???
@@ -21,10 +21,10 @@ const std::unordered_map<int, std::string> v�riMap{
 // Funktio joka setuppaa roskat
 void alusta() {
   std::cout << "\x1b[?25l"; // Piilottaa konsolin kursorin
-  system("cls");            // Tyhjent�� konsolin jos jotai turhaa j��ny
-  std::cout << "\x1b[H";    // Siirt�� kursorin vasempaan yl�reunaan
-  std::cout << "\x1b[37m";  // Laittaa tekstin v�rin valkoiseksi
-  std::cout << "\x1b[40m";  // Laittaa taustan v�rin mustaksi
+  system("cls");            // Tyhjentää konsolin jos jotai turhaa jääny
+  std::cout << "\x1b[H";    // Siirtää kursorin vasempaan yläreunaan
+  std::cout << "\x1b[37m";  // Laittaa tekstin värin valkoiseksi
+  std::cout << "\x1b[40m";  // Laittaa taustan värin mustaksi
 }
 
 // Luo ruudukon
@@ -32,19 +32,19 @@ std::vector<std::vector<int>> luoRuudukko(int& kolumnit, int& rivit, int& arvo) 
   return std::vector<std::vector<int>>(rivit, std::vector<int>(kolumnit, arvo));
 }
 
-// Paskoo ruudukon stringiin niin se on tehokkaampaa piirt��, ottaa my�s v�rit huomioon
-// ANSI-koodit l�ytyy netist� googlaa ite :3
+// Paskoo ruudukon stringiin niin se on tehokkaampaa piirtää, ottaa myäs värit huomioon
+// ANSI-koodit läytyy netistä googlaa ite :3
 std::string pakkaaRuudukko(const std::vector<std::vector<int>>& ruudukko,
-  const std::unordered_map<int, std::string>& v�riMap) {
-  std::string ruutuString; // V�liaikanen variable
+  const std::unordered_map<int, std::string>& väriMap) {
+  std::string ruutuString; // Väliaikanen variable
   for (const auto& rivi : ruudukko) {
     for (const auto& arvo : rivi) {
-      // Hassun hauska juttu googlaa unordered_map::find jos et tii� mit� se tekee
-      if (v�riMap.find(arvo) != v�riMap.end()) {
-        ruutuString += v�riMap.at(arvo) + std::to_string(arvo);
+      // Hassun hauska juttu googlaa unordered_map::find jos et tiiä mitä se tekee
+      if (väriMap.find(arvo) != väriMap.end()) {
+        ruutuString += väriMap.at(arvo) + std::to_string(arvo);
       }
       else {
-        // Jos v�ri� ei l�ydy niin resetoidaan se
+        // Jos väriä ei läydy niin resetoidaan se
         ruutuString += reset;
       }
     }
@@ -54,12 +54,12 @@ std::string pakkaaRuudukko(const std::vector<std::vector<int>>& ruudukko,
   return ruutuString;
 }
 
-// Piirret��s ruudukko stringin� jee
-void piirr�Ruudukko(const std::vector<std::vector<int>>& ruudukko,
-  const std::unordered_map<int, std::string>& v�riMap) {
-  std::cout << "\x1b[H"; // Siirt�� konsolin kursorin vasempaan yl�reunaan, jos se ei ny siell� vittu ollut
-  std::string piirrett�v� = pakkaaRuudukko(ruudukko, v�riMap);
-  std::cout << piirrett�v�; // Ilmiselv��
+// Piirretääs ruudukko stringinä jee
+void piirräRuudukko(const std::vector<std::vector<int>>& ruudukko,
+  const std::unordered_map<int, std::string>& väriMap) {
+  std::cout << "\x1b[H"; // Siirtää konsolin kursorin vasempaan yläreunaan, jos se ei ny siellä vittu ollut
+  std::string piirrettävä = pakkaaRuudukko(ruudukko, väriMap);
+  std::cout << piirrettävä; // Ilmiselvää
   std::cout << "\x1b[H";    // Takasin homo
 }
 
@@ -69,10 +69,10 @@ int main() {
   int rows = 30;
   int value = 1;
   auto ruudukko = luoRuudukko(cols, rows, value);
-  piirr�Ruudukko(ruudukko, v�riMap);
+  piirräRuudukko(ruudukko, väriMap);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   ruudukko[20][20] = 2;
   ruudukko[21][20] = 2;
   ruudukko[22][20] = 2;
-  piirr�Ruudukko(ruudukko, v�riMap);
+  piirräRuudukko(ruudukko, väriMap);
 }
