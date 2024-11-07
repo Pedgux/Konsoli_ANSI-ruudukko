@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <sstream> 
+#include <Windows.h>
 
 const std::string reset = "\x1b[0m";
 
@@ -18,6 +19,11 @@ const std::unordered_map<int, std::string> colorMap{
     {6, "\x1b[36m"}, // Cyan
     {7, "\x1b[37m"}, // White
 };
+
+// Function to check if a specific key is pressed
+bool isKeyPressed(int virtualKey) {
+  return GetAsyncKeyState(virtualKey) & 0x8000;
+}
 
 // Function to set up the console
 void initialize() {
@@ -55,15 +61,6 @@ std::ostringstream packGrid(const std::vector<std::vector<int>>& grid,
   return gridStream;
 }
 
-// Draws the grid as a string, yay
-void drawGrid(const std::vector<std::vector<int>>& grid,
-  const std::unordered_map<int, std::string>& colorMap) {
-  std::cout << "\x1b[H"; // Moves the console cursor to the top left corner, if it wasn't already there
-  std::ostringstream drawable = packGrid(grid, colorMap);
-  std::cout << drawable.str(); // Obvious
-  std::cout << "\x1b[H"; // Back to the top
-}
-
 void clearGrid(std::vector<std::vector<int>>& grid) {
   for (auto& row : grid) {
     for (auto& value : row) {
@@ -87,23 +84,51 @@ bool sameGrid(const std::vector<std::vector<int>>& grid1, const std::vector<std:
   return true;
 }
 
+bool isInsideGrid(int x, int y, int columns, int rows) {
+	return (x >= 0 && x < columns && y >= 0 && y < rows);
+}
+
+void drawGrid(const std::vector<std::vector<int>>& grid,
+  const std::unordered_map<int, std::string>& colorMap) {
+  std::cout << "\x1b[H"; // Moves the console cursor to the top left corner, if it wasn't already there
+  std::ostringstream drawable = packGrid(grid, colorMap); // Get the packed grid as a string
+  std::cout << drawable.str(); // Output the string
+  std::cout << "\x1b[H"; // Back to the top
+}
+/*
+void drawUpdatedGrid(std::vector<std::vector<int>>& grid, const std::vector<std::vector<int>>& newGrid, 
+  const std::unordered_map<int, std::string>& colorMap) {
+  try {
+		sameGrid(grid, newGrid);
+	}
+	catch (const std::runtime_error& e) {
+		std::cerr << e.what() << std::endl;
+		return;
+  }
+  if (sameGrid(grid, newGrid)) {
+		return;
+	}
+	grid = newGrid;           //assign the new state to the grid
+	drawGrid(grid, colorMap); //draw the new state
+}
+*/
+
 int main() {
   initialize();
-  int cols = 50;
-  int rows = 30;
-  int value = 1;
-  auto grid = createGrid(cols, rows, value);
-  drawGrid(grid, colorMap);
-  std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-  grid[20][20] = 2;
-  grid[21][20] = 2;
-  grid[22][20] = 2;
-  drawGrid(grid, colorMap);
-  std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-  clearGrid(grid);
-  grid[20][20] = 3;
-  grid[21][20] = 1;
-  grid[22][20] = 6;
-  drawGrid(grid, colorMap);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	int columns = 20;
+	int rows = 20;
+	int value = 0;
+  bool exit = false;
+  //testing to see if the functions work
+	std::vector<std::vector<int>> grid = createGrid(columns, rows, value);
+	std::vector<std::vector<int>> newGrid = createGrid(columns, rows, value);
+	drawGrid(grid, colorMap);
+	while (!exit) {
+    if (isKeyPressed(VK_ESCAPE)) {
+			exit = true;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+  return 0;
 }
