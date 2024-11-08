@@ -115,9 +115,11 @@ void drawUpdatedGrid(std::vector<std::vector<int>>& grid, const std::vector<std:
 
 int main() {
   initialize();
-	int columns = 20;
-	int rows = 20;
+	int columns = 80;
+	int rows = 25;
 	int value = 0;
+  int positionX = 5;
+	int valueX = 0;
   bool exit = false;
   //testing to see if the functions work
 	std::vector<std::vector<int>> grid = createGrid(columns, rows, value);
@@ -127,8 +129,21 @@ int main() {
     if (isKeyPressed(VK_ESCAPE)) {
 			exit = true;
 		}
+    if (isKeyPressed(VK_SPACE)) {
+			newGrid[0][positionX] = valueX;
+			positionX++;
+      valueX++;
+      if (valueX >= 7) {
+        valueX = 1;
+      }
+    }
+		//update / draw the grid
+    if (!sameGrid(grid, newGrid)) {
+      grid = newGrid;
+			drawGrid(grid, colorMap);
+    }
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
   return 0;
 }
