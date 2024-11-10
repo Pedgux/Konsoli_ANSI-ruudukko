@@ -8,7 +8,6 @@
 #include <Windows.h>
 
 const std::string reset = "\x1b[0m";
-
 const std::unordered_map<int, std::string> colorMap{
     {0, "\x1b[30m"}, // Black
     {1, "\x1b[31m"}, // Red
@@ -60,7 +59,7 @@ std::ostringstream packGrid(const std::vector<std::vector<int>>& grid,
   gridStream << reset;
   return gridStream;
 }
-
+//self explanatory.
 void clearGrid(std::vector<std::vector<int>>& grid) {
   for (auto& row : grid) {
     for (auto& value : row) {
@@ -68,7 +67,7 @@ void clearGrid(std::vector<std::vector<int>>& grid) {
     }
   }
 }
-
+//returns true if the grids are same
 bool sameGrid(const std::vector<std::vector<int>>& grid1, const std::vector<std::vector<int>>& grid2) {
   if ((grid1.size() != grid2.size()) || (grid1[0].size() != grid2[0].size())) {
     throw std::runtime_error("Grids are of different sizes");
@@ -83,11 +82,11 @@ bool sameGrid(const std::vector<std::vector<int>>& grid1, const std::vector<std:
   }
   return true;
 }
-
+//checks if the coordinates are inside the grid
 bool isInsideGrid(int x, int y, int columns, int rows) {
 	return (x >= 0 && x < columns && y >= 0 && y < rows);
 }
-
+//draws the grid
 void drawGrid(const std::vector<std::vector<int>>& grid,
   const std::unordered_map<int, std::string>& colorMap) {
   std::cout << "\x1b[H"; // Moves the console cursor to the top left corner, if it wasn't already there
@@ -95,54 +94,55 @@ void drawGrid(const std::vector<std::vector<int>>& grid,
   std::cout << drawable.str(); // Output the string
   std::cout << "\x1b[H"; // Back to the top
 }
-/*
-void drawUpdatedGrid(std::vector<std::vector<int>>& grid, const std::vector<std::vector<int>>& newGrid, 
-  const std::unordered_map<int, std::string>& colorMap) {
-  try {
-		sameGrid(grid, newGrid);
-	}
-	catch (const std::runtime_error& e) {
-		std::cerr << e.what() << std::endl;
-		return;
-  }
-  if (sameGrid(grid, newGrid)) {
-		return;
-	}
-	grid = newGrid;           //assign the new state to the grid
-	drawGrid(grid, colorMap); //draw the new state
+//gets the console data
+void getConsoleData(int& columns, int& rows) {
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));//PLEASE, fuck it didnt work
 }
-*/
-
+//main function
 int main() {
   initialize();
-	int columns = 80;
-	int rows = 25;
+  //set some variables
+	int columns;
+	int rows;
+	getConsoleData(columns, rows);
 	int value = 0;
-  int positionX = 5;
+  int positionX = 0;
+	int positionY = 0;
 	int valueX = 0;
   bool exit = false;
-  //testing to see if the functions work
 	std::vector<std::vector<int>> grid = createGrid(columns, rows, value);
 	std::vector<std::vector<int>> newGrid = createGrid(columns, rows, value);
 	drawGrid(grid, colorMap);
+	//why are my rows and columns weird
+	std::cout << "rows: " << rows << "\n" << " columns: " << columns << "\n";
+  //main lop
 	while (!exit) {
     if (isKeyPressed(VK_ESCAPE)) {
 			exit = true;
 		}
+		//funny thing to draw some stuff to see if shit works
     if (isKeyPressed(VK_SPACE)) {
-			newGrid[0][positionX] = valueX;
+      newGrid[positionY][positionX] = valueX;
 			positionX++;
       valueX++;
       if (valueX >= 7) {
         valueX = 1;
       }
+			if (positionX >= columns) {
+				positionX = 0;
+        std::cout << "\n";
+        positionY++;
+			}
     }
 		//update / draw the grid
     if (!sameGrid(grid, newGrid)) {
       grid = newGrid;
 			drawGrid(grid, colorMap);
     }
-
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
   return 0;
