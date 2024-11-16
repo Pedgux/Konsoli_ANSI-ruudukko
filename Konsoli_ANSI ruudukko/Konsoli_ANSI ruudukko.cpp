@@ -100,7 +100,6 @@ void getConsoleData(int& columns, int& rows) {
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));//PLEASE, fuck it didnt work
 }
 //main function
 int main() {
@@ -112,38 +111,38 @@ int main() {
 	int value = 0;
   int positionX = 0;
 	int positionY = 0;
-	int valueX = 0;
+	int valueX = 1;
   bool exit = false;
 	std::vector<std::vector<int>> grid = createGrid(columns, rows, value);
 	std::vector<std::vector<int>> newGrid = createGrid(columns, rows, value);
 	drawGrid(grid, colorMap);
 	//why are my rows and columns weird
 	std::cout << "rows: " << rows << "\n" << " columns: " << columns << "\n";
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   //main lop
 	while (!exit) {
     if (isKeyPressed(VK_ESCAPE)) {
 			exit = true;
 		}
+
 		//funny thing to draw some stuff to see if shit works
-    if (isKeyPressed(VK_SPACE)) {
-      newGrid[positionY][positionX] = valueX;
-			positionX++;
-      valueX++;
-      if (valueX >= 7) {
-        valueX = 1;
-      }
-			if (positionX >= columns) {
-				positionX = 0;
-        std::cout << "\n";
-        positionY++;
-			}
+    newGrid[positionY][positionX] = valueX;
+		positionX++;
+    valueX++;
+    if (valueX >= 7) {
+      valueX = 1;
     }
+		if (positionX >= columns) {
+			positionX = 0;
+      positionY++;
+		}
+    
 		//update / draw the grid
     if (!sameGrid(grid, newGrid)) {
       grid = newGrid;
 			drawGrid(grid, colorMap);
     }
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
   return 0;
 }
